@@ -1,0 +1,11 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Installation file for the createcontentblock module.
+ */
+function createcontentblock_uninstall() {
+  variable_del('createcontentblock_button_label');
+  variable_del('createcontentblock_include_content_management');
+}

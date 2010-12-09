@@ -1,0 +1,293 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Create Content Block (or node/add Block).
+ */
+
+/**
+ * Implementation of hook_menu().
+ *
+ * Used only when adding content types for OG.
+ */
+function createcontentblock_menu() {
+  $items = array();
+  $items['node/add-og'] = array(
+    'title' => 'Create content',
+    'page callback' => 'createcontentblock_node_add_page',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_block().
+ */
+function createcontentblock_block($op = 'list', $delta = 0, $edit = array()) {
+  switch ($op) {
+    case 'list':
+      $blocks['dropdown']['info'] = t('Create content drop down');
+      $blocks['links']['info'] = t('Create content links');
+      return $blocks;
+
+    case 'configure':
+      switch ($delta) {
+        case 'dropdown':
+          $form['button_label'] = array(
+            '#type' => 'textfield',
+            '#title' => t('Button Label'),
+            '#default_value' => variable_get('createcontentblock_button_label', t('Create Content')),
+            '#description' => t('You can change the button label'),
+          );
+          return $form;
+
+        case 'links':
+          $form['include_content_management'] = array(
+            '#type' => 'checkbox',
+            '#title' => t('Include content management link'),
+            '#default_value' => variable_get('createcontentblock_include_content_management', TRUE),
+            '#description' => t('This link will only be displayed to users who have access to the content management tool.'),
+          );
+          return $form;
+      }
+      break;
+
+    case 'save':
+      switch ($delta) {
+        case 'dropdown':
+          variable_set('createcontentblock_button_label', $edit['button_label']);
+          break;
+
+        case 'links':
+          variable_set('createcontentblock_include_content_management', $edit['include_content_management']);
+          break;
+      }
+      break;
+
+    case 'view':
+      switch ($delta) {
+        case 'dropdown':
+          if ($init = createcontentblock_form_init()) {
+            return array('content' => drupal_get_form('createcontentblock_dropdown_form', $init));
+          }
+        case 'links':
+          if ($init = createcontentblock_form_init()) {
+            return array('content' => createcontentblock_links($init));
+          }
+          break;
+      }
+      break;
+  }
+}
+
+function createcontentblock_form_init() {
+  global $user;
+  $init = array('options' => array());
+
+  $exempt = array();
+  if ($og = module_exists('og')) {
+    if ($group_node = og_get_group_context()) {
+      global $user;
+      if (isset($user->og_groups[$group_node->nid])) {
+        // Add only OG groups we have access to.
+        $init['group_nid'] = $group_node->nid;
+      }
+      else {
+        $init['subscribe_nid'] = $group_node->nid;
+      }
+      $exempt = array_merge(variable_get('og_node_types', array('og')), variable_get('og_omitted', array()));
+    }
+  }
+
+  foreach (node_get_types() as $type) {
+    if (module_invoke(node_get_types('module', $type), 'access', 'create', $type, $user)) {
+      $name = $type->name;
+      if ($og) {
+        if (variable_get('og_content_type_usage_'. $type->type, 'omitted') != 'omitted') {
+          if (isset($init['group_nid'])) {
+            if (!in_array($type->type, $exempt)) {
+              $name .= ' ('. t('this group') .')';
+            }
+          }
+          else {
+            if (!in_array($type->type, $exempt)) {
+              if (isset($init['subscribe_nid'])) {
+                unset($name);
+              }
+              else {
+                $name .= ' ('. t('for groups') .')';
+              }
+            }
+          }
+        }
+      }
+      if (isset($name)) {
+        $init['options'][$type->type] = $name;
+      }
+    }
+  }
+
+  if (count($init['options'])) {
+    return $init;
+  }
+}
+
+function createcontentblock_links($init) {
+  $links = array();
+  if (variable_get('createcontentblock_include_content_management', TRUE) && user_access('administer nodes')) {
+    $links[] = l(t('Content management'), 'admin/content/content');
+  }
+  asort($init['options']);
+  foreach ($init['options'] as $type => $name) {
+    $links[] = theme('createcontentblock_link', $name, 'node/add/'. $type);
+  }
+  return theme('item_list', $links);
+}
+
+function createcontentblock_dropdown_form($form, $init) {
+  $form = array();
+  if (isset($init['group_nid'])) {
+    $form['dest'] = array(
+      '#type' => 'hidden',
+      '#value' => 'node/'. $init['group_nid'],
+    );
+  }
+  if (isset($init['group_nid'])) {
+    $form['gid'] = array(
+      '#type' => 'hidden',
+      '#value' => $init['group_nid'],
+    );
+  }
+  if (isset($init['subscribe_nid'])) {
+    $form['subscribe'] = array(
+      '#value' => l(t('Subscribe to Add Content to this Group'), 'og/subscribe/'. $init['subscribe_nid'], array(), 'destination=node/'. $init['subscribe_nid']),
+    );
+  }
+  asort($init['options']);
+  $options = array(t('-- Select One --'));
+  $options = array_merge($options, $init['options']);
+  $form['type'] = array(
+    '#type' => 'select',
+    '#options' => $options,
+    '#default_value' => 0,
+    '#attributes' => array('onchange' => 'javascript:submit()'), // @TODO: implement in jquery
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => variable_get('createcontentblock_button_label', t('Create Content')),
+  );
+  $form['#submit'] = array('createcontentblock_dropdown_form_submit' => array());
+  return $form;
+}
+
+function createcontentblock_dropdown_form_submit($form, &$form_state) {
+  $fragment = array();
+  if (isset($form_state['values']['dest'])) {
+    $fragment[] = 'destination='. $form_state['values']['dest'];
+  }
+  if (!empty($form_state['values']['type'])) {
+    $type = str_replace('_', '-', $form_state['values']['type']);
+    if (empty($form_state['values']['gid'])) {
+      drupal_goto('node/add/'. $type, implode('&', $fragment));
+    }
+    else {
+      $fragment[] = 'gids[]='. $form_state['values']['gid'];
+      drupal_goto('node/add/'. $type, implode('&', $fragment));
+    }
+  }
+  elseif (isset($form_state['values']['gid'])) {
+    $fragment[] = 'gids[]='. $form_state['values']['gid'];
+    drupal_goto('node/add-og', implode('&', $fragment));
+  }
+  else {
+    drupal_goto('node/add', implode('&', $fragment));
+  }
+}
+
+/**
+ * Present a node submission form or a set of links to such forms.
+ */
+function createcontentblock_node_add_page() {
+  if (!module_exists('og')) {
+    drupal_goto('node/add');
+    return;
+  }
+
+  global $user;
+
+  if (is_numeric($_GET['gids'][0])) {
+    if ($group_node = node_load($_GET['gids'][0])) {
+      $group_name = theme('og_group_name', $group_node);
+    }
+  }
+
+  $types = node_get_types();
+
+  $exempt = array_merge(variable_get('og_node_types', array('og')), variable_get('og_omitted', array()));
+
+  // Display a node type overview.
+  foreach ($types as $type) {
+    if (function_exists($type->module .'_form') && node_access('create', $type->type)) {
+      $type_url_str = str_replace('_', '-', $type->type);
+      $title = t('Add a new @s.', array('@s' => $type->name));
+      $link_title = drupal_ucfirst($type->name);
+      if (isset($group_node) && !in_array($type->type, $exempt)) {
+        $type_url_str .= "?gids[]=". $group_node->nid;
+        $link_title .= ' - '. $group_name;
+      }
+      $out = '<dt>'. l($link_title, "node/add/$type_url_str", array('title' => $title)) .'</dt>';
+      $out .= '<dd>'. filter_xss_admin($type->description) .'</dd>';
+      $item[$type->type] = $out;
+    }
+  }
+
+  if (isset($item)) {
+    uksort($item, 'strnatcasecmp');
+    $output = t('Choose the appropriate item from the list:') .'<dl>'. implode('', $item) .'</dl>';
+  }
+  else {
+    $output = t('No content types available.');
+  }
+
+  return $output;
+}
+
+/**
+ * Implementation of hook_theme().
+ */
+function createcontentblock_theme() {
+  return array(
+    'createcontentblock_og_group_title' => array(
+      'arguments' => array('node' => NULL),
+    ),
+    'createcontentblock_link' => array(
+      'arguments' => array('title' => NULL, 'path' => NULL),
+    ),
+  );
+}
+
+/**
+ * Override this theme function to change the title of the OG group on the
+ * node/add-og page.
+ */
+function theme_createcontentblock_og_group_title($node) {
+  return $node->title;
+}
+
+/**
+ * Allows users to customize the link.
+ *
+ * For example, they could add the word 'Add' or 'Create' in front of the node
+ * name.
+ * @param $title
+ *   The name of the content type.
+ * @param $path
+ *   The path to the node add page.
+ * @return
+ *   The HTML formatted link.
+ */
+function theme_createcontentblock_link($title, $path) {
+  return l($title, $path);
+}
