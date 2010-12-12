@@ -1,4 +1,4 @@
 ; $Id$
 name = Create Content Block
-description = Extends the user inteface for creating content by providing a pulldown block of content types and a button for quickly creating new content, the block is OG aware and adds the group id to the links when on an OG page
+description = A FORK of the <a href="http://drupal.org/project/createcontentblock">createcontentblock module</a> that acts more like the openatrium create block.
 core = 6.x

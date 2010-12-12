@@ -1,0 +1,147 @@
+/* $Id$ */
+
+/*
+ * All javascript blocks are addressed with .processed
+ */
+.block-createcontentblock.block.processed {
+  float:left;
+  position:relative;
+  overflow:visible;
+  z-index: 499;
+  padding-left:5px;
+  background:transparent;
+  margin:0px;
+  padding:0px;
+  border:0px;
+  -moz-box-shadow:none;
+  -webkit-box-shadow:none;
+  height:30px;
+}
+
+/*
+ * The block header needs to have these styles
+ */
+.block-createcontentblock.processed h2.block-title {
+  cursor:pointer;
+  text-transform:lowercase;
+  height:20px;
+  margin:0;
+  border-bottom:none;
+  color:white;
+  background:url('img/darkback.png') repeat;
+  padding:5px 5px;
+  font-family:arial;
+  font-size:14px;
+
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+}
+.block-createcontentblock.processed h2.block-title a {
+  color:inherit;
+  font-weight:bold;
+}
+.block-createcontentblock.processed h2.block-title.toggle-active {
+  color:gray;
+}
+.block-createcontentblock.block .block-title span.icon {
+  display:block;
+  float:left;
+  width:20px;
+  height:20px;
+  margin-right:5px;
+  font-size:19px;
+  font-weight:normal;
+  text-align:center;
+  background: url('img/bg.png') repeat;
+  -moz-border-radius:7px;
+  -webkit-border-radius:7px;
+  }
+
+.block-createcontentblock .content {
+  z-index:499;
+  position:absolute;
+  display:none;
+  }
+
+
+.block-createcontentblock.block.processed .toggle-active {
+  -moz-border-radius:5px 5px 0px 0px;
+  -webkit-border-bottom-left-radius:0;
+  -webkit-border-bottom-right-radius:0;
+  background:#fff;
+  }
+
+.block-createcontentblock.processed .content {
+  z-index:498;
+  background:#f8f8f8;
+  border:5px solid #fff;
+  padding:0px;
+  right:0px;
+  min-width:180px;
+
+  /* W00T */
+  -moz-box-shadow:0px 2px 2px #666;
+  -webkit-box-shadow:0px 2px 2px #666;
+  -moz-border-radius:5px 0px 5px 5px;
+  -webkit-border-radius:5px;
+  -webkit-border-top-right-radius:0px;
+  }
+
+.block-createcontentblock form,
+.block-createcontentblock ul.links,
+.block-createcontentblock .item-list {
+  -moz-border-radius:0px;
+  -webkit-border-radius:0px;
+  min-width:180px;
+  }
+
+.block-createcontentblock.processed li {
+  float:none;
+  padding:0px;
+  margin:0px;
+  border:0px;
+  }
+
+.block-createcontentblock li a,
+.block-createcontentblock .more-link a {
+  float:none;
+  width:130px;
+  height:20px;
+  line-height:20px;
+  display:block;
+
+  overflow:hidden;
+  white-space:nowrap;
+  padding:2px 40px 2px 10px;
+  font-family:arial;
+  font-size:12px;
+  font-weight:normal;
+  color:inherit;
+  }
+
+.block-createcontentblock li a:hover,
+.block-createcontentblock .more-link a:hover {
+  background:url('img/darkback.png') repeat;
+  color:white;
+  text-decoration:none;
+}
+
+  .block-createcontentblock li a span {
+    float:left;
+    margin-right:10px;
+    }
+
+.block-createcontentblock span.icon { overflow:hidden; height:20px; width:20px; margin-right:5px; }
+.block-createcontentblock span.icon.node-page { background:url(img/sprite_icons.png) -240px 0 no-repeat; }
+.block-createcontentblock span.icon.node-story,
+.block-createcontentblock span.icon.node-blog { background:url(img/sprite_icons.png) 0 0 no-repeat; }
+.block-createcontentblock span.icon.node-group { background:url(img/sprite_icons.png) -100 0 no-repeat; }
+.block-createcontentblock span.icon.node-loc { background:url(img/sprite_icons.png) -220px 0 no-repeat; }
+.block-createcontentblock span.icon.node-facility { background:url(img/sprite_icons.png) -120px 0 no-repeat; }
+.block-createcontentblock span.icon.node-community_blog { background:url(img/sprite_icons.png) -180px 0 no-repeat; }
+.block-createcontentblock span.icon.node-news { background:url(img/sprite_icons.png) -200px 0 no-repeat; }
+.block-createcontentblock span.icon.node-video { background:url(img/sprite_icons.png) -260px 0 no-repeat; }
+.block-createcontentblock span.icon.node-image,
+.block-createcontentblock span.icon.node-photo,
+.block-createcontentblock span.icon.node-gallery { background:url(img/sprite_icons.png) -280px 0 no-repeat; }
+.block-createcontentblock span.icon.node-event { background:url(img/sprite_icons.png) -40px 0 no-repeat; }
