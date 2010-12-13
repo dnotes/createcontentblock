@@ -3,7 +3,7 @@
 /*
  * All javascript blocks are addressed with .processed
  */
-.block-createcontentblock.block.processed {
+.block-createcontentblock.block {
   float:left;
   position:relative;
   overflow:visible;
@@ -21,7 +21,7 @@
 /*
  * The block header needs to have these styles
  */
-.block-createcontentblock.processed h2.block-title {
+.block-createcontentblock h2.block-title {
   cursor:pointer;
   text-transform:lowercase;
   height:20px;
@@ -36,11 +36,11 @@
   -moz-border-radius:5px;
   -webkit-border-radius:5px;
 }
-.block-createcontentblock.processed h2.block-title a {
+.block-createcontentblock h2.block-title a {
   color:inherit;
   font-weight:bold;
 }
-.block-createcontentblock.processed h2.block-title.toggle-active {
+.block-createcontentblock h2.block-title.toggle-active {
   color:gray;
 }
 .block-createcontentblock.block .block-title span.icon {
@@ -64,14 +64,14 @@
   }
 
 
-.block-createcontentblock.block.processed .toggle-active {
+.block-createcontentblock.block .toggle-active {
   -moz-border-radius:5px 5px 0px 0px;
   -webkit-border-bottom-left-radius:0;
   -webkit-border-bottom-right-radius:0;
   background:#fff;
   }
 
-.block-createcontentblock.processed .content {
+.block-createcontentblock .content {
   z-index:498;
   background:#f8f8f8;
   border:5px solid #fff;
@@ -95,7 +95,7 @@
   min-width:180px;
   }
 
-.block-createcontentblock.processed li {
+.block-createcontentblock li {
   float:none;
   padding:0px;
   margin:0px;
