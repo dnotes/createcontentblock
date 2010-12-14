@@ -135,11 +135,14 @@
 .block-createcontentblock span.icon.node-page { background:url(img/sprite_icons.png) -240px 0 no-repeat; }
 .block-createcontentblock span.icon.node-story,
 .block-createcontentblock span.icon.node-blog { background:url(img/sprite_icons.png) 0 0 no-repeat; }
-.block-createcontentblock span.icon.node-group { background:url(img/sprite_icons.png) -100 0 no-repeat; }
+.block-createcontentblock span.icon.node-group,
+.block-createcontentblock span.icon.node-community { background:url(img/sprite_icons.png) -100px 0 no-repeat; }
 .block-createcontentblock span.icon.node-loc { background:url(img/sprite_icons.png) -220px 0 no-repeat; }
 .block-createcontentblock span.icon.node-facility { background:url(img/sprite_icons.png) -120px 0 no-repeat; }
 .block-createcontentblock span.icon.node-community_blog { background:url(img/sprite_icons.png) -180px 0 no-repeat; }
-.block-createcontentblock span.icon.node-news { background:url(img/sprite_icons.png) -200px 0 no-repeat; }
+.block-createcontentblock span.icon.node-news,
+.block-createcontentblock span.icon.node-article,
+.block-createcontentblock span.icon.node-news_item { background:url(img/sprite_icons.png) -200px 0 no-repeat; }
 .block-createcontentblock span.icon.node-video { background:url(img/sprite_icons.png) -260px 0 no-repeat; }
 .block-createcontentblock span.icon.node-image,
 .block-createcontentblock span.icon.node-photo,
