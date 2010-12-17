@@ -57,9 +57,10 @@ function createcontentblock_getlinks() {
   foreach (system_admin_menu_block($item) as $menu_item) {
     $args = explode('/', $menu_item['href']);
     $type = str_replace('-', '_', array_pop($args));
+    $title = $menu_item['title'];
     $menu_item['title'] = "<span class='icon node-{$type}'></span>{$menu_item['title']}";
     $menu_item['html'] = TRUE;
-    $links["{$type}"] = $menu_item;
+    $links["{$title}:{$type}"] = $menu_item;
   }
   ksort($links);
   return $links;
