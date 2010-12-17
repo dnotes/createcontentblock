@@ -41,7 +41,7 @@ function createcontentblock_block($op = 'list', $delta = 0, $edit = array()) {
     case 'view':
       if ($links = createcontentblock_getlinks($delta)) {
         $subject = t('Create');
-        if (variable_get('createcontentblock_use_javascript', TRUE)) {
+        if (variable_get("createcontentblock_use_javascript_$delta", TRUE)) {
           drupal_add_css(drupal_get_path('module', 'createcontentblock') . '/createcontentblock.css');
           drupal_add_js(drupal_get_path('module', 'createcontentblock') . '/createcontentblock.js');
           $subject = "<span class='icon'>+</span> <a href='/node/add'>$subject</a>";
