@@ -14,7 +14,6 @@ function createcontentblock_block($op = 'list', $delta = 0, $edit = array()) {
     case 'list':
       $blocks['nodeadd'] = array(
         'info' => t('Create content'),
-        'cache' => module_exists('og') ? BLOCK_NO_CACHE : BLOCK_CACHE_PER_USER,
         'status' => 1,
         'region' => 'header_last',
       );
