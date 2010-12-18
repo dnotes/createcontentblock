@@ -6,6 +6,11 @@
  * Create Content Block (or node/add Block).
  */
 
+function createcontentblock_init() {
+  drupal_add_css(drupal_get_path('module', 'createcontentblock') . '/createcontentblock.css');
+  drupal_add_js(drupal_get_path('module', 'createcontentblock') . '/createcontentblock.js');
+}
+
 /**
  * Implementation of hook_block().
  */
@@ -14,15 +19,16 @@ function createcontentblock_block($op = 'list', $delta = 0, $edit = array()) {
     case 'list':
       $blocks['nodeadd'] = array(
         'info' => t('Create content'),
-        #'cache' => module_exists('og') ? BLOCK_NO_CACHE : BLOCK_CACHE_PER_USER,
-        'cache' => BLOCK_NO_CACHE,
+        'cache' => BLOCK_CACHE_PER_USER,
         'status' => 1,
         'region' => 'header_last',
       );
 //      if (module_exists('og')) {
 //        $blocks['og_nodeadd']['info'] = t('Create content in group');
+//        $blocks['og_nodeadd']['cache'] = BLOCK_NO_CACHE;
 //      }
       return $blocks;
+      break;
 
     case 'configure':
       $form['use_javascript'] = array(
@@ -32,30 +38,28 @@ function createcontentblock_block($op = 'list', $delta = 0, $edit = array()) {
         '#description' => t('Use javascript to make the form collapse'),
       );
       return $form;
+      break;
 
     case 'save':
 
-      foreach(element_children($edit) as $e) {
-        variable_set("createcontentblock_$e", $edit[$e]);
-      }
+      variable_set("createcontentblock_use_javascript_$delta", $edit['use_javascript']);
+      break;
 
     case 'view':
-      if ($links = createcontentblock_getlinks($delta)) {
+      if ($links = createcontentblock_getlinks($delta)) { // intentional assignment of $links
+        $linkclass = variable_get("createcontentblock_use_javascript_$delta", TRUE) ? 'collapse' : 'nocollapse';
         $subject = t('Create');
-        if (variable_get("createcontentblock_use_javascript_$delta", TRUE)) {
-          drupal_add_css(drupal_get_path('module', 'createcontentblock') . '/createcontentblock.css');
-          drupal_add_js(drupal_get_path('module', 'createcontentblock') . '/createcontentblock.js');
-          $subject = "<span class='icon'>+</span> <a href='/node/add'>$subject</a>";
-        }
-        return array('subject' => $subject, 'content' => theme('links', $links));
+        return array('subject' => $subject, 'content' => theme('links', $links, array('class' => "createcontentblock-links $linkclass")));
       }
+      break;
   }
 }
 
-function createcontentblock_getlinks() {
+function createcontentblock_getlinks($delta) {
   $item = menu_get_item('node/add');
   $links = array();
-  foreach (system_admin_menu_block($item) as $menu_item) {
+  $menu_items = system_admin_menu_block($item);
+  foreach ($menu_items as $menu_item) {
     $args = explode('/', $menu_item['href']);
     $type = str_replace('-', '_', array_pop($args));
     $title = $menu_item['title'];
@@ -66,3 +70,4 @@ function createcontentblock_getlinks() {
   ksort($links);
   return $links;
 }
+

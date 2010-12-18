@@ -3,7 +3,7 @@
 /*
  * All javascript blocks are addressed with .processed
  */
-.block-createcontentblock.block {
+.block-createcontentblock.block.processed {
   float:left;
   position:relative;
   overflow:visible;
@@ -21,7 +21,7 @@
 /*
  * The block header needs to have these styles
  */
-.block-createcontentblock h2.block-title {
+.block-createcontentblock.processed h2.block-title {
   cursor:pointer;
   text-transform:lowercase;
   height:20px;
@@ -36,11 +36,11 @@
   -moz-border-radius:5px;
   -webkit-border-radius:5px;
 }
-.block-createcontentblock h2.block-title a {
+.block-createcontentblock.processed h2.block-title a {
   color:inherit;
   font-weight:bold;
 }
-.block-createcontentblock h2.block-title.toggle-active {
+.block-createcontentblock.processed h2.block-title.toggle-active {
   color:gray;
 }
 .block-createcontentblock.block .block-title span.icon {
@@ -57,21 +57,21 @@
   -webkit-border-radius:7px;
   }
 
-.block-createcontentblock .content {
+.block-createcontentblock.processed .content {
   z-index:499;
   position:absolute;
   display:none;
   }
 
 
-.block-createcontentblock.block .toggle-active {
+.block-createcontentblock.block.processed .toggle-active {
   -moz-border-radius:5px 5px 0px 0px;
   -webkit-border-bottom-left-radius:0;
   -webkit-border-bottom-right-radius:0;
   background:#fff;
   }
 
-.block-createcontentblock .content {
+.block-createcontentblock.processed .content {
   z-index:498;
   background:#f8f8f8;
   border:5px solid #fff;
@@ -85,25 +85,28 @@
   -moz-border-radius:5px 0px 5px 5px;
   -webkit-border-radius:5px;
   -webkit-border-top-right-radius:0px;
-  }
+}
 
 .block-createcontentblock form,
-.block-createcontentblock ul.links,
+.block-createcontentblock ul.createcontentblock-links,
 .block-createcontentblock .item-list {
   -moz-border-radius:0px;
   -webkit-border-radius:0px;
-  min-width:180px;
-  }
+}
 
-.block-createcontentblock li {
+ul.createcontentblock-links li {
+  clear:left;
+  list-style:none;
+}
+.block-createcontentblock.processed li {
   float:none;
   padding:0px;
   margin:0px;
   border:0px;
-  }
+}
 
-.block-createcontentblock li a,
-.block-createcontentblock .more-link a {
+.block-createcontentblock.processed li a,
+.block-createcontentblock.processed .more-link a {
   float:none;
   width:130px;
   height:20px;
@@ -117,10 +120,10 @@
   font-size:12px;
   font-weight:normal;
   color:inherit;
-  }
+}
 
-.block-createcontentblock li a:hover,
-.block-createcontentblock .more-link a:hover {
+.block-createcontentblock.processed li a:hover,
+.block-createcontentblock.processed .more-link a:hover {
   background:url('img/darkback.png') repeat;
   color:white;
   text-decoration:none;

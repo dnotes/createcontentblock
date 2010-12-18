@@ -6,6 +6,8 @@
  * Installation file for the createcontentblock module.
  */
 function createcontentblock_uninstall() {
-  variable_del('createcontentblock_button_label');
-  variable_del('createcontentblock_include_content_management');
+  $ret = array();
+  $ret[] = update_sql("DELETE FROM {variable} WHERE name LIKE 'createcontentblock_use_javascript%%'");
+  $ret[] = update_sql("DELETE FROM {blocks} WHERE module = 'createcontentblock'");
+  return $ret;
 }
