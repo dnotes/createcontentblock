@@ -92,6 +92,8 @@
 .block-createcontentblock .item-list {
   -moz-border-radius:0px;
   -webkit-border-radius:0px;
+  margin:0;
+  padding:0;
 }
 
 ul.createcontentblock-links li {
