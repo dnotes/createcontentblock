@@ -58,7 +58,7 @@ function createcontentblock_block($op = 'list', $delta = 0, $edit = array()) {
       break;
 
     case 'view':
-      if ($links = createcontentblock_getlinks($delta)) { // intentional assignment of $links
+      if (is_array($links = createcontentblock_getlinks($delta)) && count($links)) { // intentional assignment of $links
         $linkclass = variable_get("createcontentblock_use_javascript_$delta", TRUE) ? 'collapse' : 'nocollapse';
         $subject = t('Create');
         return array('subject' => $subject, 'content' => theme('links', $links, array('class' => "createcontentblock-links $linkclass")));
@@ -93,11 +93,11 @@ function createcontentblock_getlinks($delta) {
     // The weight is offset so it is always positive, with a uniform 5-digits.
     $menu_items[(50000 + $item['weight']) .' '. drupal_strtolower($item['title']) .' '. $item['mlid']] = $item;
   }
-  ksort($menu_items);
-  if (module_exists('og') && $delta == 'og_nodeadd') {
-    $group_node = og_get_group_context();
-  }
   if (is_array($menu_items)) {
+    ksort($menu_items);
+    if (module_exists('og') && $delta == 'og_nodeadd') {
+      $group_node = og_get_group_context();
+    }
     foreach ($menu_items as $key => $menu_item) {
       $args = explode('/', $menu_item['href']);
       $type = str_replace('-', '_', array_pop($args));
@@ -116,3 +116,27 @@ function createcontentblock_getlinks($delta) {
   return $links;
 }
 
+/**
+ * This is an example of an implementation of hook_createcontentblock_filter;
+ * you would use exactly this function if your module, og_nodeadd, were
+ * implementing the hook.
+ * @param array $links
+ * The links to be filtered.  Each link is a menu item that also contains a
+ * title, href, and type (the node type)
+ * @return array
+ * The modified array of links, or FALSE to show no menu at all
+ */
+function og_nodeadd_createcontentblock_filter($links) {
+  $group_node = og_get_group_context();
+  $postables = og_get_types('group_post');
+  if (!is_array($postables)) { return FALSE; }
+  foreach ($links as $key => $link) {
+    if (in_array($link['type'], $postables)) {
+      $links[$key]['query'] = array('gids[]' => $group_node->nid);
+    }
+    else {
+      unset($links[$key]);
+    }
+  }
+  return $links;
+}
