@@ -4,6 +4,12 @@
 /**
  * @file
  * Create Content Block (or node/add Block).
+ *
+ * This module defines one hook - hook_createcontentblock_filter - that other
+ * modules may implement to create a custom block.  The hook should return an
+ * array of node type machine names with which the user should be presented.
+ * Regardless of that array, however, the user will not be presented with the
+ * option to add a node their role does not have permission to add on the site.
  */
 
 function createcontentblock_init() {
@@ -23,10 +29,16 @@ function createcontentblock_block($op = 'list', $delta = 0, $edit = array()) {
         'status' => 1,
         'region' => 'header_last',
       );
-//      if (module_exists('og')) {
-//        $blocks['og_nodeadd']['info'] = t('Create content in group');
-//        $blocks['og_nodeadd']['cache'] = BLOCK_NO_CACHE;
-//      }
+      if (module_exists('og')) {
+        $blocks['og_nodeadd']['info'] = t('Create content in group');
+        $blocks['og_nodeadd']['cache'] = BLOCK_NO_CACHE;
+      }
+      foreach (module_implements('createcontentblock_filter') as $module) {
+        $blocks[$module] = array(
+          'info' => t('Create content - ' . $module),
+          'cache' => BLOCK_NO_CACHE,
+        );
+      }
       return $blocks;
       break;
 
@@ -57,17 +69,50 @@ function createcontentblock_block($op = 'list', $delta = 0, $edit = array()) {
 
 function createcontentblock_getlinks($delta) {
   $item = menu_get_item('node/add');
-  $links = array();
-  $menu_items = system_admin_menu_block($item);
-  foreach ($menu_items as $menu_item) {
-    $args = explode('/', $menu_item['href']);
-    $type = str_replace('-', '_', array_pop($args));
-    $title = $menu_item['title'];
-    $menu_item['title'] = "<span class='icon node-{$type}'></span>{$menu_item['title']}";
-    $menu_item['html'] = TRUE;
-    $links["{$title}:{$type}"] = $menu_item;
+  $links = $ret = array();
+  if (!isset($item['mlid'])) {
+    $item += db_fetch_array(db_query("SELECT mlid, menu_name FROM {menu_links} ml WHERE ml.router_path = '%s' AND module = 'system'", $item['path']));
   }
-  ksort($links);
+  $respect_hidden = ($delta == 'nodeadd') ? ' AND hidden = 0' : '';
+  $result = db_query("
+    SELECT m.load_functions, m.to_arg_functions, m.access_callback, m.access_arguments, m.page_callback, m.page_arguments, m.title, m.title_callback, m.title_arguments, m.type, m.description, ml.*
+    FROM {menu_links} ml
+    LEFT JOIN {menu_router} m ON ml.router_path = m.path
+    WHERE ml.plid = %d AND ml.menu_name = '%s'$respect_hidden", $item['mlid'], $item['menu_name']);
+  while ($item = db_fetch_array($result)) {
+    _menu_link_translate($item);
+    if (!$item['access']) {
+      continue;
+    }
+    // The link 'description' either derived from the hook_menu 'description' or
+    // entered by the user via menu module is saved as the title attribute.
+    if (!empty($item['localized_options']['attributes']['title'])) {
+      $item['description'] = $item['localized_options']['attributes']['title'];
+    }
+    // Prepare for sorting as in function _menu_tree_check_access().
+    // The weight is offset so it is always positive, with a uniform 5-digits.
+    $menu_items[(50000 + $item['weight']) .' '. drupal_strtolower($item['title']) .' '. $item['mlid']] = $item;
+  }
+  ksort($menu_items);
+  if (module_exists('og') && $delta == 'og_nodeadd') {
+    $group_node = og_get_group_context();
+  }
+  if (is_array($menu_items)) {
+    foreach ($menu_items as $key => $menu_item) {
+      $args = explode('/', $menu_item['href']);
+      $type = str_replace('-', '_', array_pop($args));
+      $menu_item['title'] = "<span class='icon node-{$type}'></span>{$menu_item['title']}";
+      $menu_item['html'] = TRUE;
+      $menu_item['type'] = $type;
+      if ($delta == 'og_nodeadd') {
+        $menu_item['query'] = array('gids[]' => $group_node->nid);
+      }
+      $links[$key] = $menu_item;
+    }
+    if (function_exists($function = "{$delta}_createcontentblock_filter")) {
+      $links = $function($links);
+    }
+  }
   return $links;
 }
 
