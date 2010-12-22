@@ -39,6 +39,9 @@
 .block-createcontentblock.processed h2.block-title a {
   color:inherit;
   font-weight:bold;
+  font-family:arial;
+  font-size:14px;
+  color:white;
 }
 .block-createcontentblock.processed h2.block-title.toggle-active {
   color:gray;
